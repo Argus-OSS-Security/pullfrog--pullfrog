@@ -1,33 +1,34 @@
 name: Publish & Release
 
-on:
-  # dispatch only, and deliberately so. a `workflow_dispatch` needs a GitHub session or token
-  # carrying write access; a stolen git push credential carries neither, so it can no longer start a
-  # release by landing a commit. bumping the version in package.json is therefore inert until a
-  # maintainer runs `gh workflow run publish.yml -R pullfrog/pullfrog -f notes="$(cat notes.md)"`,
-  # and the staged version then still needs their 2FA approval before npm serves it.
-  #
-  # two jobs. `stage` puts the version in npm's staged queue. `finish` runs on the `release-approval`
-  # environment, whose required reviewers are the npm maintainers: GitHub holds the run there, with no
-  # runner, for up to 30 days. the npm approval is the gate; the environment approval only resumes the
-  # run, and `finish` checks the registry before it tags or releases anything. `stager`, run by the
-  # maintainer with one authenticator code, does both, approving on npm and then resuming the run.
-  #
-  # only `finish` can write a tag. the "Release tags" ruleset refuses tag creation, moves and deletions
-  # to everyone, admins and workflow tokens included, except deploy keys; the one deploy key is the
-  # `RELEASE_TAG_KEY` secret on `release-approval`, so neither a version tag nor `v0` moves until a
-  # maintainer approved the run.
-  #
-  # everything the release needs is given at dispatch: the commit is the one dispatched, the version
-  # comes from its package.json, and the release notes are the required `notes` input. a run's inputs
-  # are fixed for its whole life, so the notes survive the approval wait and any re-run of a job.
-  workflow_dispatch:
-    inputs:
-      notes:
-        description: 'Release notes in Markdown, the body of the GitHub release. Pass a file with -f notes="$(cat notes.md)".'
-        type: string
-        required: true
-
+# Triggers intentionally disabled for Argus-OSS-Security.
+# on:
+#   # dispatch only, and deliberately so. a `workflow_dispatch` needs a GitHub session or token
+#   # carrying write access; a stolen git push credential carries neither, so it can no longer start a
+#   # release by landing a commit. bumping the version in package.json is therefore inert until a
+#   # maintainer runs `gh workflow run publish.yml -R pullfrog/pullfrog -f notes="$(cat notes.md)"`,
+#   # and the staged version then still needs their 2FA approval before npm serves it.
+#   #
+#   # two jobs. `stage` puts the version in npm's staged queue. `finish` runs on the `release-approval`
+#   # environment, whose required reviewers are the npm maintainers: GitHub holds the run there, with no
+#   # runner, for up to 30 days. the npm approval is the gate; the environment approval only resumes the
+#   # run, and `finish` checks the registry before it tags or releases anything. `stager`, run by the
+#   # maintainer with one authenticator code, does both, approving on npm and then resuming the run.
+#   #
+#   # only `finish` can write a tag. the "Release tags" ruleset refuses tag creation, moves and deletions
+#   # to everyone, admins and workflow tokens included, except deploy keys; the one deploy key is the
+#   # `RELEASE_TAG_KEY` secret on `release-approval`, so neither a version tag nor `v0` moves until a
+#   # maintainer approved the run.
+#   #
+#   # everything the release needs is given at dispatch: the commit is the one dispatched, the version
+#   # comes from its package.json, and the release notes are the required `notes` input. a run's inputs
+#   # are fixed for its whole life, so the notes survive the approval wait and any re-run of a job.
+#   workflow_dispatch:
+#     inputs:
+#       notes:
+#         description: 'Release notes in Markdown, the body of the GitHub release. Pass a file with -f notes="$(cat notes.md)".'
+#         type: string
+#         required: true
+# 
 permissions: {}
 
 jobs:
